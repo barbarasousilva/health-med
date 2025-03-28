@@ -2,7 +2,7 @@ services:
 
   backend:
     build:
-      context: ./backend/HealthMed.Api
+      context: ./backend
       dockerfile: Dockerfile
     container_name: healthmed-backend
     environment:

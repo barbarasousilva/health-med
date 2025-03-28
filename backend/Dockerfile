@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-COPY ../HealthMed.sln .
-COPY ./ ./HealthMed.Api/
+COPY HealthMed.sln .
+COPY HealthMed.Api/ ./HealthMed.Api/
 WORKDIR /app/HealthMed.Api
 
 RUN dotnet restore
