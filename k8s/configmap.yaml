@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap
+  labels: 
+    app: healthmed
+data:
+  BACKEND_PORT: "5001"
+  FRONTEND_PORT: "3000"
+  DB_HOST: db
+  DB_PORT: "5432"
+  DB_NAME: healthmeddb
+  ASPNETCORE_ENVIRONMENT: Development
+  VITE_API_URL: http://localhost:3000

@@ -1,3 +1,4 @@
+using System.Data;
 using DotNetEnv;
 using HealthMed.Api.Infrastructure;
 
@@ -9,11 +10,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
-
+builder.Services.AddScoped<IDbConnection>(sp =>
+{
+    var factory = sp.GetRequiredService<IDbConnectionFactory>();
+    return factory.CreateConnection();
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

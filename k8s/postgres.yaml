@@ -1,0 +1,101 @@
+---
+# PersistentVolumeClaim para armazenar os dados do banco
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# ConfigMap contendo o script de criação de tabelas
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-db-script
+  labels:
+    app: postgres
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS Medicos (
+      Id UUID PRIMARY KEY,
+      Nome VARCHAR(100) NOT NULL,
+      CRM VARCHAR(20) UNIQUE NOT NULL,
+      Especialidade VARCHAR(100) NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS Pacientes (
+      Id UUID PRIMARY KEY,
+      Nome VARCHAR(100) NOT NULL,
+      Email VARCHAR(100) UNIQUE NOT NULL,
+      CPF VARCHAR(11) UNIQUE NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS HorariosDisponiveis (
+      Id UUID PRIMARY KEY,
+      MedicoId UUID NOT NULL REFERENCES Medicos(Id),
+      DataHora TIMESTAMP NOT NULL,
+      Status VARCHAR(20) DEFAULT 'livre'
+    );
+
+    CREATE TABLE IF NOT EXISTS Consultas (
+      Id UUID PRIMARY KEY,
+      PacienteId UUID NOT NULL REFERENCES Pacientes(Id),
+      MedicoId UUID NOT NULL REFERENCES Medicos(Id),
+      HorarioId UUID NOT NULL REFERENCES HorariosDisponiveis(Id),
+      Status VARCHAR(20) DEFAULT 'agendada',
+      JustificativaCancelamento TEXT,
+      CriadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+---
+# Atualizado Deployment do PostgreSQL com initContainer
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: healthmeddb
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DB_PASS
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-volume
+      volumes:
+        - name: postgres-volume
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+        - name: init-script
+          configMap:
+            name: init-db-script
+            items:
+              - key: init.sql
+                path: init.sql

@@ -1,0 +1,49 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db-job
+spec:
+  template:
+    metadata:
+      name: init-db
+    spec:
+      containers:
+        - name: init-db
+          image: postgres:15
+          command: ["sh", "-c"]
+          args:
+            - |
+              echo "Esperando o banco iniciar...";
+              until pg_isready -h postgres -p 5432; do sleep 2; done;
+              echo "Conectado. Executando script...";
+              psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -f /scripts/init.sql;
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DB_PASS
+            - name: POSTGRES_DB
+              value: healthmeddb
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DB_PASS
+          volumeMounts:
+            - name: init-script-volume
+              mountPath: /scripts
+      restartPolicy: OnFailure
+      volumes:
+        - name: init-script-volume
+          configMap:
+            name: init-db-script
+            items:
+              - key: init.sql
+                path: init.sql
