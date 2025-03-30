@@ -53,6 +53,7 @@ Thumbs.db
 *.ntvs*
 *.njsproj
 *.sw?
+**/Properties/launchSettings.json
 
 # ---- Env ----
 .env
