@@ -1,6 +1,9 @@
 using System.Data;
 using DotNetEnv;
-using HealthMed.Api.Infrastructure;
+using HealthMed.Infrastructure.Persistence;
+using HealthMed.Infrastructure.Auth;
+using HealthMed.Application.Services;
+using HealthMed.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,8 @@ Env.Load();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
 builder.Services.AddScoped<IDbConnection>(sp =>
 {

@@ -2,7 +2,7 @@ using System.Data;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
-namespace HealthMed.Api.Infrastructure
+namespace HealthMed.Infrastructure.Persistence
 {
     public class DbConnectionFactory : IDbConnectionFactory
     {
