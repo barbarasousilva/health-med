@@ -27,23 +27,27 @@ public class AuthService : IAuthService
         if (medico == null || !BCrypt.Net.BCrypt.Verify(loginDto.Senha, medico.SenhaHash))
             return null;
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["JWT_SECRET"]!);
+        var tokenHandler = new JwtSecurityTokenHandler
+        {
+            MapInboundClaims = false
+        };
+        var key = Convert.FromHexString(_configuration["JWT_SECRET"]!);
+        var securityKey = new SymmetricSecurityKey(key);
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
+        {
+            new Claim("id", medico.Id.ToString()),
+            new Claim(ClaimTypes.Name, medico.Nome),
+            new Claim("crm", medico.CRM),
+            new Claim(ClaimTypes.Role, "medico")
+        };
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, medico.Id.ToString()),
-                new Claim(ClaimTypes.Name, medico.Nome),
-                new Claim("crm", medico.CRM),
-                new Claim("role", "medico")
-            }),
+            Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddHours(2),
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature
-            )
+            SigningCredentials = credentials
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
