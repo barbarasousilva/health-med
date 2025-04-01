@@ -48,17 +48,19 @@ public class HorariosDisponiveisController : ControllerBase
     public async Task<IActionResult> Cadastrar([FromBody] CadastrarHorarioDto dto)
     {
         var medicoId = User.GetMedicoId();
-        var id = await _service.AdicionarAsync(medicoId, dto);
+        var id = await _service.AdicionarAsync(medicoId, dto.DataHora, dto.DataHoraFim, dto.Status);
         return CreatedAtAction(nameof(Listar), new { id }, new { id });
     }
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Atualizar(Guid id, [FromBody] EditarHorarioDto dto)
     {
         var medicoId = User.GetMedicoId();
-        await _service.AtualizarAsync(id, medicoId, dto);
+        await _service.AtualizarAsync(id, medicoId, dto.DataHora, dto.DataHoraFim, dto.Status);
         return NoContent();
     }
+
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Remover(Guid id)
@@ -72,7 +74,8 @@ public class HorariosDisponiveisController : ControllerBase
     public async Task<IActionResult> AbrirAgenda([FromBody] AbrirAgendaDto dto)
     {
         var medicoId = User.GetMedicoId();
-        await _service.AbrirAgendaAsync(medicoId, dto);
+        await _service.AbrirAgendaAsync(medicoId, dto.Data, dto.Duracao.ToTimeSpan());
         return Ok(new { mensagem = "Agenda aberta com sucesso!" });
     }
+
 }

@@ -1,5 +1,3 @@
-namespace HealthMed.Domain.Entities;
-
 public class Medico
 {
     public Guid Id { get; private set; }
@@ -7,20 +5,17 @@ public class Medico
     public string CRM { get; private set; }
     public string Especialidade { get; private set; }
     public string SenhaHash { get; private set; }
+    public string Cidade { get; private set; }
+    public string UF { get; private set; }
 
-    public Medico() { }
-
-    public Medico(string nome, string crm, string especialidade, string senhaHash)
+    public Medico(Guid id, string nome, string crm, string especialidade, string senhaHash, string cidade, string uf)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         Nome = nome;
         CRM = crm;
         Especialidade = especialidade;
         SenhaHash = senhaHash;
-    }
-
-    public void AtualizarSenha(string novoHash)
-    {
-        SenhaHash = novoHash;
+        Cidade = cidade;
+        UF = uf;
     }
 }

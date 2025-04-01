@@ -1,7 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using HealthMed.Application.DTOs;
-using HealthMed.Application.Services;
 using HealthMed.Domain.Entities;
 using HealthMed.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -20,11 +18,11 @@ public class PacienteService : IPacienteService
         _configuration = configuration;
     }
 
-    public async Task<string?> AutenticarPacienteAsync(LoginPacienteDto loginDto)
+    public async Task<string?> AutenticarPacienteAsync(string cpfOuEmail, string senha)
     {
-        var paciente = await _repository.ObterPorCpfOuEmailAsync(loginDto.CpfOuEmail);
+        var paciente = await _repository.ObterPorCpfOuEmailAsync(cpfOuEmail);
 
-        if (paciente == null || !BCrypt.Net.BCrypt.Verify(loginDto.Senha, paciente.SenhaHash))
+        if (paciente == null || !BCrypt.Net.BCrypt.Verify(senha, paciente.SenhaHash))
             return null;
 
         var tokenHandler = new JwtSecurityTokenHandler { MapInboundClaims = false };
@@ -50,24 +48,23 @@ public class PacienteService : IPacienteService
         return tokenHandler.WriteToken(token);
     }
 
-    public async Task<Guid> RegistrarPacienteAsync(RegistrarPacienteDto dto)
+    public async Task<Guid> RegistrarPacienteAsync(Paciente paciente)
     {
-        var cpf = new string(dto.Cpf.Where(char.IsDigit).ToArray());
-        Console.WriteLine($"CPF tratado: {cpf} - Tamanho: {cpf.Length}");
+        var cpf = new string(paciente.Cpf.Where(char.IsDigit).ToArray());
 
-
-        if (await _repository.ObterPorEmailOuCpfAsync(dto.Email, cpf) is not null)
+        if (await _repository.ObterPorEmailOuCpfAsync(paciente.Email, cpf) is not null)
             throw new InvalidOperationException("Já existe um paciente com esse CPF ou e-mail.");
 
-        var paciente = new Paciente(
-            Guid.NewGuid(),
-            dto.Nome.Trim(),
+        var pacienteFinal = new Paciente(
+            paciente.Id,
+            paciente.Nome.Trim(),
             cpf,
-            dto.Email.Trim().ToLowerInvariant(),
-            BCrypt.Net.BCrypt.HashPassword(dto.Senha)
+            paciente.Email.Trim().ToLowerInvariant(),
+            BCrypt.Net.BCrypt.HashPassword(paciente.SenhaHash)
         );
 
-        await _repository.AdicionarAsync(paciente);
-        return paciente.Id;
+        await _repository.AdicionarAsync(pacienteFinal);
+        return pacienteFinal.Id;
     }
+
 }

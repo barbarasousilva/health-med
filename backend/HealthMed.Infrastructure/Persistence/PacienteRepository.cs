@@ -1,9 +1,7 @@
-using System.Data;
 using Dapper;
 using HealthMed.Domain.Entities;
 using HealthMed.Domain.Interfaces;
-
-namespace HealthMed.Infrastructure.Persistence;
+using System.Data;
 
 public class PacienteRepository : IPacienteRepository
 {
@@ -37,10 +35,17 @@ public class PacienteRepository : IPacienteRepository
     public async Task AdicionarAsync(Paciente paciente)
     {
         const string query = @"
-            INSERT INTO pacientes (id, nome, cpf, email, senhaHash)
-            VALUES (@Id, @Nome, @Cpf, @Email, @SenhaHash);
+            INSERT INTO pacientes (id, nome, cpf, email, senhahash)
+            VALUES (@Id, @Nome, @CPF, @Email, @SenhaHash);
         ";
 
-        await _connection.ExecuteAsync(query, paciente);
+        await _connection.ExecuteAsync(query, new
+        {
+            paciente.Id,
+            paciente.Nome,
+            paciente.Cpf,
+            paciente.Email,
+            paciente.SenhaHash
+        });
     }
 }

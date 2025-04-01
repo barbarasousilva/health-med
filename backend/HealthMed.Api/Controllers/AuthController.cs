@@ -1,5 +1,7 @@
 using HealthMed.Application.DTOs;
 using HealthMed.Application.Services;
+using HealthMed.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HealthMed.Api.Controllers;
@@ -8,11 +10,11 @@ namespace HealthMed.Api.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly IAuthService _auth;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService auth)
     {
-        _authService = authService;
+        _auth = auth;
     }
 
     [HttpGet("up")]
@@ -22,17 +24,14 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login-medico")]
-    public async Task<IActionResult> LoginMedico([FromBody] LoginMedicoDto loginDto)
+    [AllowAnonymous]
+    public async Task<IActionResult> LoginMedico([FromBody] LoginMedicoDto dto)
     {
-        var token = await _authService.AutenticarMedicoAsync(loginDto);
+        var token = await _auth.AutenticarMedicoAsync(dto.CRM, dto.Senha);
 
         if (token == null)
-            return Unauthorized(new { mensagem = "CRM ou senha inválidos." });
+            return Unauthorized(new { mensagem = "Credenciais inválidas." });
 
-        return Ok(new
-        {
-            token,
-            tipo = "Bearer"
-        });
+        return Ok(new { token, tipo = "Bearer" });
     }
 }

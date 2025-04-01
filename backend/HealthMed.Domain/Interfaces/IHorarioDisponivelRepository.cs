@@ -5,8 +5,8 @@ namespace HealthMed.Domain.Interfaces;
 public interface IHorarioDisponivelRepository
 {
     Task AdicionarAsync(HorarioDisponivel horario);
-    Task<IEnumerable<HorarioDisponivel>> ListarPorMedicoAsync(Guid medicoId);
-    Task<HorarioDisponivel?> ObterPorIdAsync(Guid id);
     Task AtualizarAsync(HorarioDisponivel horario);
+    Task<HorarioDisponivel?> ObterPorIdAsync(Guid id);
+    Task<IEnumerable<HorarioDisponivel>> ListarPorMedicoAsync(Guid idMedico);
     Task RemoverAsync(Guid id);
 }
