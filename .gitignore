@@ -57,3 +57,7 @@ Thumbs.db
 
 # ---- Env ----
 .env
+
+# ---- Tests ----
+TestResults/
+coverage-report/
