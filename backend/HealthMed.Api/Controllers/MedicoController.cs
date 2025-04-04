@@ -9,9 +9,9 @@ namespace HealthMed.Api.Controllers;
 [Route("api/medicos")]
 public class MedicoController : ControllerBase
 {
-    private readonly MedicoService _medicoService;
+    private readonly IMedicoService _medicoService;
 
-    public MedicoController(MedicoService medicoService)
+    public MedicoController(IMedicoService medicoService)
     {
         _medicoService = medicoService;
     }
