@@ -1,3 +1,5 @@
+using HealthMed.Domain.Entities;
+
 public class Medico
 {
     public Guid Id { get; private set; }
@@ -7,6 +9,8 @@ public class Medico
     public string SenhaHash { get; private set; }
     public string Cidade { get; private set; }
     public string UF { get; private set; }
+
+    public ICollection<HorarioDisponivel> HorariosDisponiveis { get; set; } = new List<HorarioDisponivel>();
 
     public Medico(Guid id, string nome, string crm, string especialidade, string senhaHash, string cidade, string uf)
     {

@@ -39,31 +39,4 @@ public class MedicoController : ControllerBase
             return Conflict(new { mensagem = ex.Message });
         }
     }
-
-    [HttpGet]
-    [AllowAnonymous]
-    public async Task<IActionResult> Buscar([FromQuery] BuscarMedicosDto dto)
-    {
-        var filtro = new FiltroMedico
-        {
-            Nome = dto.Nome,
-            Especialidade = dto.Especialidade,
-            Cidade = dto.Cidade,
-            UF = dto.UF
-        };
-
-        var medicos = await _medicoService.BuscarAsync(filtro);
-
-        var resultado = medicos.Select(m => new
-        {
-            m.Id,
-            m.Nome,
-            m.CRM,
-            m.Especialidade,
-            m.Cidade,
-            m.UF
-        });
-
-        return Ok(resultado);
-    }
 }

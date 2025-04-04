@@ -47,7 +47,7 @@ builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddScoped<ConsultaService>();
 builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
 builder.Services.AddScoped<MedicoService>();
-builder.Services.AddScoped<IHorarioDisponiveRepositoryl, HorarioDisponivelRepository>();
+builder.Services.AddScoped<IHorarioDisponivelRepository, HorarioDisponivelRepository>();
 builder.Services.AddScoped<IHorarioDisponivelService, HorarioDisponivelService>();
 builder.Services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
 builder.Services.AddScoped<IDbConnection>(sp =>

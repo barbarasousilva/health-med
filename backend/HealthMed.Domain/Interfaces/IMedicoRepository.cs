@@ -1,3 +1,5 @@
+using HealthMed.Domain.Entities;
+
 namespace HealthMed.Domain.Interfaces
 {
     public interface IMedicoRepository

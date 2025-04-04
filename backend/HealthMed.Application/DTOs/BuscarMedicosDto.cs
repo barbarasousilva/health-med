@@ -1,9 +1,11 @@
-namespace HealthMed.Application.DTOs;
-
-public class BuscarMedicosDto
+namespace HealthMed.Application.DTOs
 {
-    public string? Nome { get; set; }
-    public string? Especialidade { get; set; }
-    public string? Cidade { get; set; }
-    public string? UF { get; set; }
+    public class BuscarMedicosDto
+    {
+        public Guid Id { get; set; }
+        public DateTime DataHora { get; set; }
+        public DateTime DataHoraFim { get; set; }
+        public string NomeMedico { get; set; } = string.Empty;
+        public string Especialidade { get; set; } = string.Empty;
+    }
 }

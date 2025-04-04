@@ -1,5 +1,8 @@
+using HealthMed.Api.Helpers;
 using HealthMed.Application.DTOs;
 using HealthMed.Application.Services;
+using HealthMed.Domain.Enums;
+using HealthMed.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -10,12 +13,13 @@ namespace HealthMed.API.Controllers;
 [Route("consultas")]
 public class ConsultaController : ControllerBase
 {
-    private readonly ConsultaService _consultaService;
+    private readonly IConsultaService _consultaService;
 
-    public ConsultaController(ConsultaService consultaService)
+    public ConsultaController(IConsultaService consultaService)
     {
         _consultaService = consultaService;
     }
+
 
     [HttpPost]
     [Authorize(Roles = "paciente")]
@@ -34,6 +38,15 @@ public class ConsultaController : ControllerBase
     {
         await _consultaService.CancelarConsultaAsync(id, dto.Justificativa);
         return Ok(new { mensagem = "Consulta cancelada com sucesso." });
+    }
+
+    [Authorize(Roles = "medico")]
+    [HttpGet("consultas/pendentes")]
+    public async Task<IActionResult> ListarConsultasPendentes([FromServices] IConsultaService consultaService)
+    {
+        var medicoId = User.GetMedicoId();
+        var consultasPendentes = await consultaService.ListarPorStatusAsync(medicoId, StatusConsulta.Pendente);
+        return Ok(consultasPendentes);
     }
 
     [HttpPut("{id}/aceitar")]
