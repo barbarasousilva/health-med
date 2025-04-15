@@ -17,6 +17,10 @@
 - Cadastro de horários disponíveis
 - Aceitar ou recusar consultas agendadas
 
+### Admin (futuro)
+- Visão centralizada do sistema
+- Monitoramento e métricas
+
 ---
 
 ## 🚀 Tecnologias Utilizadas
@@ -40,6 +44,7 @@ health-med/
 ├── frontend/        # SPA React com Vite e Tailwind
 ├── k8s/             # Manifests do Kubernetes (Deployments, Services, ConfigMaps...)
 ├── docs/            # Documentação do projeto (arquitetura, pipeline, etc)
+├── scripts/         # Shell scripts para publicação de imagens e restauração local
 ├── compose.yml      # Docker Compose para ambiente local
 ├── .github/workflows/  # CI com GitHub Actions
 ```
@@ -85,8 +90,8 @@ docker compose -f compose.yml up --build
 ```
 
 Acesso local:
-- Frontend: http://localhost:3000
-- Backend: http://localhost:5001
+- Frontend: http://localhost:3000  
+- Backend: http://localhost:5001  
 
 ---
 
@@ -107,9 +112,34 @@ kubectl rollout undo deployment/frontend
 
 ---
 
+## 🔐 Variáveis de Ambiente e Arquivos Sensíveis
+
+Este projeto utiliza arquivos `.env` e `secrets.yaml` para armazenar configurações sensíveis (como JWT, conexão com banco e chaves). Por segurança:
+
+- **`.env`** e **`k8s/secrets.yaml`** NÃO devem ser versionados. Ambos já estão listados no `.gitignore`
+- Um exemplo de variáveis está disponível em [`.env.example`](./.env.example)
+
+### Como criar o seu `.env`
+```bash
+cp .env.example .env
+```
+
+### Como gerar os secrets no Kubernetes manualmente:
+```bash
+kubectl create secret generic secrets \
+  --from-literal=DB_USER=postgres \
+  --from-literal=DB_PASS=your_password \
+  --from-literal=DB_CONNECTION_STRING="Host=db;Port=5432;Database=healthmeddb;Username=postgres;Password=your_password" \
+  --from-literal=JWT_SECRET=your_jwt_secret_here
+```
+
+> O arquivo `secrets.yaml` pode ser recriado com base nas variáveis do `.env`. Documentado para garantir consistência entre os ambientes.
+
+---
+
 ## 📄 Documentação
 - [`docs/arquitetura.md`](./docs/arquitetura.md): Arquitetura do sistema
-- [`docs/ci-cd.md`](./docs/ci-cd.md): CI/CD, deploy e rollback
+- [`docs/pipeline.md`](./docs/pipeline.md): CI/CD, deploy e rollback
 
 ---
 

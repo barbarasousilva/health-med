@@ -61,3 +61,12 @@ Thumbs.db
 # ---- Tests ----
 TestResults/
 coverage-report/
+
+# ---- Scripts ----
+scripts/
+
+# Secrets do Kubernetes
+k8s/secrets.yaml
+
+# Configuração do kubectl (opcional)
+~/.kube/config
