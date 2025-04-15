@@ -16,6 +16,14 @@ jobs:
       - name: 🔄 Checkout do repositório
         uses: actions/checkout@v4
 
+      - name: 💾 Cache do NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
       - name: ⚙️ Setup do .NET 8
         uses: actions/setup-dotnet@v4
         with:
@@ -65,7 +73,9 @@ jobs:
 
       - name: 🔐 Configurar kubeconfig
         run: |
+          mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+
 
       - name: 🚀 Deploy para o Kubernetes
         run: kubectl apply -f k8s/
