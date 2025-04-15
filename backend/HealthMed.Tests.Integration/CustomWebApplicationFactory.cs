@@ -43,6 +43,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     // Carrega o .env no ambiente
     private static void LoadEnvironmentVariables()
     {
+
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("JWT_SECRET_TEST")) &&
+        !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_TEST")))
+        {
+            return;
+        }
+
         var basePath = AppContext.BaseDirectory;
         var current = new DirectoryInfo(basePath);
         while (current != null && !File.Exists(Path.Combine(current.FullName, ".env")))

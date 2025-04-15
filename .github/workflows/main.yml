@@ -41,7 +41,7 @@ jobs:
       - name: ✅ Rodar testes (unitários e integração)
         run: dotnet test ./backend/HealthMed.sln --configuration Debug
 
-  docker-deploy:
+  deploy:
     needs: build-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
