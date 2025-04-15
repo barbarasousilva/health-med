@@ -1,0 +1,17 @@
+node_modules
+bin
+obj
+.vs
+*.log
+.env
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+
+**/bin
+**/obj
+**/*.user
+**/*.suo
+.vscode
+.git

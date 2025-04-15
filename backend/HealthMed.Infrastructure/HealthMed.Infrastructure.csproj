@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="Dapper" Version="2.1.66" />
+		<PackageReference Include="DotNetEnv" Version="3.1.1" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.14" />
+		<PackageReference Include="Npgsql" Version="9.0.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
+	</ItemGroup>	
+
+  <ItemGroup>
+    <ProjectReference Include="..\HealthMed.Application\HealthMed.Application.csproj" />
+    <ProjectReference Include="..\HealthMed.Domain\HealthMed.Domain.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
