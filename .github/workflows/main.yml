@@ -46,7 +46,13 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD || secrets.DOCKERHUB_TOKEN }}
 
+      - name: 📂 Printar caminho atual e arquivos
+        run: |
+          pwd
+          ls -lah
+
       - name: 📦 Build e Push com Docker Compose
+        working-directory: ./
         run: |
           docker compose -f compose.yml build backend frontend
           docker tag barbarasousilva/healthmed-backend:latest barbarasousilva/healthmed-backend:latest
