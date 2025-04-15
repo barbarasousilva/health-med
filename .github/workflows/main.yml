@@ -9,8 +9,11 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
+
     env:
       DOCKER_BUILDKIT: 1
+      JWT_SECRET_TEST: ${{ secrets.JWT_SECRET_TEST }}
+      DB_CONNECTION_STRING_TEST: ${{ secrets.DB_CONNECTION_STRING_TEST }}
 
     steps:
       - name: 🔄 Checkout do repositório
@@ -33,27 +36,12 @@ jobs:
         run: dotnet restore ./backend/HealthMed.sln
 
       - name: 🛠️ Build do projeto
-        run: dotnet build ./backend/HealthMed.sln --configuration Release --no-restore
-
-      - name: 📄 Criar arquivo .env para testes de integração
-        working-directory: ./backend
-        run: |
-          cat <<EOF > .env
-          DB_USER=${{ secrets.DB_USER }}
-          DB_PASS=${{ secrets.DB_PASS }}
-          DB_NAME=healthmeddb
-          DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          DB_CONNECTION_STRING_TEST=${{ secrets.DB_CONNECTION_STRING_TEST }}
-          JWT_SECRET_TEST=${{ secrets.JWT_SECRET_TEST }}
-          ASPNETCORE_ENVIRONMENT=Development
-          EOF
+        run: dotnet build ./backend/HealthMed.sln --configuration Debug --no-restore
 
       - name: ✅ Rodar testes (unitários e integração)
         run: dotnet test ./backend/HealthMed.sln --configuration Debug
 
-
-  deploy:
+  docker-deploy:
     needs: build-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -76,7 +64,7 @@ jobs:
       - name: 📦 Build e Push com Docker Compose
         working-directory: ./
         run: |
-          docker compose -f compose.yaml build backend frontend
+          docker compose -f compose.yml build backend frontend
           docker tag barbarasousilva/healthmed-backend:latest barbarasousilva/healthmed-backend:latest
           docker tag barbarasousilva/healthmed-frontend:latest barbarasousilva/healthmed-frontend:latest
           docker push barbarasousilva/healthmed-backend:latest
@@ -89,7 +77,6 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
-
 
       - name: 🚀 Deploy para o Kubernetes
         run: kubectl apply -f k8s/
