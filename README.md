@@ -57,6 +57,16 @@ health-med/
 - Testes de integração com banco PostgreSQL real (via docker-compose)
 - Pipeline executa os testes antes de qualquer deploy
 
+### 🧪 Testes Locais
+
+Os testes (unitários e de integração) estão disponíveis no repositório e são executados automaticamente na pipeline de CI/CD.  
+Eles também podem ser rodados manualmente localmente:
+
+```bash
+dotnet test ./backend/HealthMed.Tests.Unit
+dotnet test ./backend/HealthMed.Tests.Integration
+```
+
 ---
 
 ## ☁️ CI/CD e Deploy
