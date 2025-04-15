@@ -67,7 +67,7 @@ public class PacienteControllerTests
         };
 
         var pacienteId = Guid.NewGuid();
-        _serviceMock.Setup(s => s.RegistrarPacienteAsync(It.IsAny<Paciente>()))
+        _serviceMock.Setup(s => s.RegistrarPacienteAsync(It.IsAny<Paciente>(), dto.Senha))
                     .ReturnsAsync(pacienteId);
 
 

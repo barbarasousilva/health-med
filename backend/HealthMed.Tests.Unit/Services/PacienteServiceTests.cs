@@ -34,7 +34,7 @@ public class PacienteServiceTests
         _repoMock.Setup(r => r.ObterPorEmailOuCpfAsync(It.IsAny<string>(), It.IsAny<string>()))
                  .ReturnsAsync((Paciente?)null);
 
-        await _service.RegistrarPacienteAsync(paciente);
+        await _service.RegistrarPacienteAsync(paciente, "123456");
 
         _repoMock.Verify(r => r.AdicionarAsync(It.Is<Paciente>(p =>
             !string.IsNullOrEmpty(p.SenhaHash) &&
@@ -53,7 +53,7 @@ public class PacienteServiceTests
         var novo = new Paciente(Guid.NewGuid(), "Maria", "maria@exemplo.com", "12345678900", "novaSenha");
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _service.RegistrarPacienteAsync(novo));
+            _service.RegistrarPacienteAsync(novo, "novaSenha"));
     }
 
     [Fact(DisplayName = "AutenticarPacienteAsync deve retornar token se senha for válida")]
