@@ -36,7 +36,7 @@ jobs:
         run: dotnet build ./backend/HealthMed.sln --configuration Release --no-restore
 
       - name: ✅ Rodar testes (unitários e integração)
-        run: dotnet test ./backend/HealthMed.sln --no-build --configuration Debug
+        run: dotnet test ./backend/HealthMed.sln --configuration Debug
 
 
   docker-deploy:
