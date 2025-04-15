@@ -34,11 +34,10 @@ public class PacienteController : ControllerBase
             Guid.NewGuid(),
             dto.Nome.Trim(),
             dto.Cpf,
-            dto.Email.Trim().ToLowerInvariant(),
-            dto.Senha
+            dto.Email.Trim().ToLowerInvariant()
         );
 
-        var id = await _service.RegistrarPacienteAsync(paciente);
+        var id = await _service.RegistrarPacienteAsync(paciente, dto.Senha);
         return CreatedAtAction(nameof(Registrar), new { id }, new { id });
     }
 }

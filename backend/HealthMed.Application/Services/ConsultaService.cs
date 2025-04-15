@@ -4,13 +4,17 @@ using HealthMed.Domain.Interfaces;
 
 namespace HealthMed.Application.Services;
 
-public class ConsultaService
+public class ConsultaService : IConsultaService
 {
     private readonly IConsultaRepository _consulta;
 
     public ConsultaService(IConsultaRepository consulta)
     {
         _consulta = consulta;
+    }
+    public async Task<IEnumerable<object>> ListarPorStatusAsync(Guid medicoId, StatusConsulta status)
+    {
+        return await _consulta.ListarPorStatusAsync(medicoId, status);
     }
 
     public async Task AgendarConsultaAsync(Guid idPaciente, Guid idMedico, Guid idHorarioDisponivel)
@@ -63,4 +67,5 @@ public class ConsultaService
             null
         );
     }
+
 }

@@ -39,4 +39,8 @@ public class HorarioDisponivel
         DataHoraFim = novaDataHoraFim;
         Status = novoStatus;
     }
+    public void MarcarComoOcupado()
+    {
+        Status = StatusHorario.Ocupado;
+    }
 }

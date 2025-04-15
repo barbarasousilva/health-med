@@ -24,4 +24,9 @@ public static class ClaimsPrincipalExtensions
     {
         return user.FindFirstValue(ClaimTypes.Name) ?? string.Empty;
     }
+    public static Guid GetPacienteId(this ClaimsPrincipal user)
+    {
+        var claim = user.Claims.FirstOrDefault(c => c.Type == "id");
+        return claim != null ? Guid.Parse(claim.Value) : Guid.Empty;
+    }
 }

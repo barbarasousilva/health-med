@@ -3,6 +3,7 @@ using HealthMed.Application.Services;
 using HealthMed.Api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HealthMed.Api.Controllers;
 
@@ -22,7 +23,6 @@ public class HorariosDisponiveisController : ControllerBase
     public IActionResult Up()
     {
         var medicoId = User.GetMedicoId();
-        Console.WriteLine($"MedicoId extraído do token: {medicoId}");
         var crm = User.GetCRM();
         var nome = User.GetNome();
 
@@ -39,10 +39,13 @@ public class HorariosDisponiveisController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Listar()
     {
-        var medicoId = User.GetMedicoId();
+        var medicoId = User.GetMedicoId(); // Log para verificar se o id está sendo extraído corretamente
+        var role = User.FindFirstValue(ClaimTypes.Role); // Verifica o role
+
         var horarios = await _service.ListarPorMedicoAsync(medicoId);
         return Ok(horarios);
     }
+
 
     [HttpPost]
     public async Task<IActionResult> Cadastrar([FromBody] CadastrarHorarioDto dto)

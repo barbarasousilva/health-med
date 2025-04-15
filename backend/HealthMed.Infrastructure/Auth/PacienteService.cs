@@ -25,9 +25,14 @@ public class PacienteService : IPacienteService
         if (paciente == null || !BCrypt.Net.BCrypt.Verify(senha, paciente.SenhaHash))
             return null;
 
-        var tokenHandler = new JwtSecurityTokenHandler { MapInboundClaims = false };
-        var key = Convert.FromHexString(_configuration["JWT_SECRET"]!);
-        var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+
+        var jwtSecret = _configuration["JWT_SECRET"];
+        if (string.IsNullOrEmpty(jwtSecret))
+            throw new InvalidOperationException("JWT_SECRET não configurado.");
+
+        var keyBytes = Convert.FromHexString(jwtSecret);
+        var key = new SymmetricSecurityKey(keyBytes) { KeyId = "chave-token" };
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
         {
@@ -37,18 +42,20 @@ public class PacienteService : IPacienteService
             new Claim(ClaimTypes.Role, "paciente")
         };
 
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddHours(2),
-            SigningCredentials = credentials
-        };
+        var tokenDescriptor = new JwtSecurityToken(
+        issuer: "HealthMed",
+        audience: "HealthMed",
+        claims: claims,
+        expires: DateTime.UtcNow.AddHours(2),
+        signingCredentials: credentials
+        );
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+        return tokenString;
     }
 
-    public async Task<Guid> RegistrarPacienteAsync(Paciente paciente)
+    public async Task<Guid> RegistrarPacienteAsync(Paciente paciente, string senha)
     {
         var cpf = new string(paciente.Cpf.Where(char.IsDigit).ToArray());
 
@@ -57,10 +64,10 @@ public class PacienteService : IPacienteService
 
         var pacienteFinal = new Paciente(
             paciente.Id,
-            paciente.Nome.Trim(),
+            paciente.Nome,
             cpf,
-            paciente.Email.Trim().ToLowerInvariant(),
-            BCrypt.Net.BCrypt.HashPassword(paciente.SenhaHash)
+            paciente.Email,
+            BCrypt.Net.BCrypt.HashPassword(senha)
         );
 
         await _repository.AdicionarAsync(pacienteFinal);

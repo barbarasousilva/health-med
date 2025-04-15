@@ -15,6 +15,20 @@ public class ConsultaRepository : IConsultaRepository
     {
         _connection = connection;
     }
+    public async Task<IEnumerable<Consulta>> ListarPorStatusAsync(Guid idMedico, StatusConsulta status)
+    {
+        var sql = @"SELECT * FROM consultas 
+                WHERE medicoid = @idMedico 
+                  AND status = @status";
+
+        var rows = await _connection.QueryAsync<ConsultaRaw>(sql, new
+        {
+            idMedico,
+            status = status.ToString()
+        });
+
+        return rows.Select(MapearConsulta);
+    }
 
     public async Task AdicionarAsync(Consulta consulta)
     {

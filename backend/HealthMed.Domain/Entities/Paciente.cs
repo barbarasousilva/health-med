@@ -18,6 +18,14 @@ public class Paciente
         Cpf = cpf;
         SenhaHash = senhaHash;
     }
+    public Paciente(Guid id, string nome, string cpf, string email)
+    {
+        Id = id;
+        Nome = nome;
+        Cpf = cpf;
+        Email = email;
+        SenhaHash = ""; // será preenchido depois
+    }
 
     public void AtualizarSenha(string novaSenhaHash)
     {
