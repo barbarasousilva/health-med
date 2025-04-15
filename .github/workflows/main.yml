@@ -35,11 +35,25 @@ jobs:
       - name: 🛠️ Build do projeto
         run: dotnet build ./backend/HealthMed.sln --configuration Release --no-restore
 
+      - name: 📄 Criar arquivo .env para testes de integração
+        working-directory: ./backend
+        run: |
+          cat <<EOF > .env
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASS=${{ secrets.DB_PASS }}
+          DB_NAME=healthmeddb
+          DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          DB_CONNECTION_STRING_TEST=${{ secrets.DB_CONNECTION_STRING_TEST }}
+          JWT_SECRET_TEST=${{ secrets.JWT_SECRET_TEST }}
+          ASPNETCORE_ENVIRONMENT=Development
+          EOF
+
       - name: ✅ Rodar testes (unitários e integração)
         run: dotnet test ./backend/HealthMed.sln --configuration Debug
 
 
-  docker-deploy:
+  deploy:
     needs: build-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
