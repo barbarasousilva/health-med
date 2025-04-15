@@ -22,13 +22,14 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: 🧪 Restore dependências
-        run: dotnet restore
+        run: dotnet restore ./backend/HealthMed.sln
 
       - name: 🛠️ Build do projeto
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build ./backend/HealthMed.sln --configuration Release --no-restore
 
       - name: ✅ Rodar testes (unitários e integração)
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test ./backend/HealthMed.sln --no-build --verbosity normal
+
 
   docker-deploy:
     needs: build-test
