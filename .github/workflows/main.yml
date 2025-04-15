@@ -1,0 +1,64 @@
+name: CI/CD - HealthMed
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: 1
+
+    steps:
+      - name: 🔄 Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup do .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: 🧪 Restore dependências
+        run: dotnet restore
+
+      - name: 🛠️ Build do projeto
+        run: dotnet build --configuration Release --no-restore
+
+      - name: ✅ Rodar testes (unitários e integração)
+        run: dotnet test --no-build --verbosity normal
+
+  docker-deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 🔄 Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: 🐳 Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD || secrets.DOCKERHUB_TOKEN }}
+
+      - name: 📦 Build e Push com Docker Compose
+        run: |
+          docker compose compose.yml build backend frontend
+          docker tag barbarasousilva/healthmed-backend:latest barbarasousilva/healthmed-backend:latest
+          docker tag barbarasousilva/healthmed-frontend:latest barbarasousilva/healthmed-frontend:latest
+          docker push barbarasousilva/healthmed-backend:latest
+          docker push barbarasousilva/healthmed-frontend:latest
+
+      - name: ☸️ Instalar kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: 🔐 Configurar kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+
+      - name: 🚀 Deploy para o Kubernetes
+        run: kubectl apply -f k8s/

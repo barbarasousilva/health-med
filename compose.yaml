@@ -1,6 +1,9 @@
 services:
 
   backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     image: barbarasousilva/healthmed-backend:latest
     container_name: healthmed-backend
     environment:
@@ -15,6 +18,9 @@ services:
       - app-net
 
   frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     image: barbarasousilva/healthmed-frontend:latest
     container_name: healthmed-frontend
     ports:
