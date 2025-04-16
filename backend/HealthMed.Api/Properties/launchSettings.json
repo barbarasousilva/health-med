@@ -6,12 +6,7 @@
             "dotnetRunMessages": true,
             "launchBrowser": true,
             "launchUrl": "swagger",
-            "applicationUrl": "http://localhost:5005",
-            "environmentVariables": {
-                "ASPNETCORE_ENVIRONMENT": "Development",
-                "DB_CONNECTION_STRING": "Host=localhost;Port=5432;Database=healthmeddb;Username=postgres;Password=123456",
-                "JWT_SECRET": "8f3d7234f8c84f189f09a7c4be8b0d2e13b6f5b241f7416abfd3343f6c2f6b2a"
-            }
+            "applicationUrl": "http://localhost:5005"
         }
     }
 }

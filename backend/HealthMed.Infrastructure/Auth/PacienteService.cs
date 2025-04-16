@@ -17,7 +17,6 @@ public class PacienteService : IPacienteService
         _repository = repository;
         _configuration = configuration;
     }
-
     public async Task<string?> AutenticarPacienteAsync(string cpfOuEmail, string senha)
     {
         var paciente = await _repository.ObterPorCpfOuEmailAsync(cpfOuEmail);
@@ -28,7 +27,7 @@ public class PacienteService : IPacienteService
 
         var jwtSecret = _configuration["JWT_SECRET"];
         if (string.IsNullOrEmpty(jwtSecret))
-            throw new InvalidOperationException("JWT_SECRET n„o configurado.");
+            throw new InvalidOperationException("JWT_SECRET n√£o configurado.");
 
         var keyBytes = Convert.FromHexString(jwtSecret);
         var key = new SymmetricSecurityKey(keyBytes) { KeyId = "chave-token" };
@@ -50,9 +49,9 @@ public class PacienteService : IPacienteService
         signingCredentials: credentials
         );
 
-
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         return tokenString;
+
     }
 
     public async Task<Guid> RegistrarPacienteAsync(Paciente paciente, string senha)
@@ -60,18 +59,22 @@ public class PacienteService : IPacienteService
         var cpf = new string(paciente.Cpf.Where(char.IsDigit).ToArray());
 
         if (await _repository.ObterPorEmailOuCpfAsync(paciente.Email, cpf) is not null)
-            throw new InvalidOperationException("J· existe um paciente com esse CPF ou e-mail.");
+            throw new InvalidOperationException("J√° existe um paciente com esse CPF ou e-mail.");
+
+
+        var hash = BCrypt.Net.BCrypt.HashPassword(senha);
 
         var pacienteFinal = new Paciente(
             paciente.Id,
             paciente.Nome,
             cpf,
             paciente.Email,
-            BCrypt.Net.BCrypt.HashPassword(senha)
+            hash
         );
 
         await _repository.AdicionarAsync(pacienteFinal);
         return pacienteFinal.Id;
     }
+
 
 }

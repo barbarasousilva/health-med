@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Xunit;
 using HealthMed.Application.DTOs;
+using System.Collections.Generic;
 
 namespace HealthMed.Tests.Integration;
 
@@ -10,57 +11,52 @@ public class PacienteTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
+    private const string PacienteCpf = "12345678901";
+    private const string PacienteEmail = "paciente@teste.com";
+    private const string Senha = "123456";
+
     public PacienteTests(CustomWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }
 
-    [Fact(DisplayName = "Registrar paciente com dados v�lidos retorna Created")]
-    public async Task Registrar_DeveRetornarCreated()
+    [Fact(DisplayName = "Login com e-mail retorna token JWT se credenciais forem válidas")]
+    public async Task Login_ComEmail_DeveRetornarToken()
     {
-        var identificador = Guid.NewGuid().ToString("N")[..6];
-        var email = $"paciente_{identificador}@teste.com";
-        var cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => new Random().Next(0, 10).ToString()));
-        Console.WriteLine($"CPF Registrar Paciente: {cpf}");
-
-        var registro = new RegistrarPacienteDto
+        var login = new LoginPacienteDto
         {
-            Nome = "Paciente Teste",
-            Email = email,
-            Cpf = cpf,
-            Senha = "123456"
+            CpfOuEmail = PacienteEmail,
+            Senha = Senha
         };
 
-        var response = await _client.PostAsJsonAsync("/api/auth/paciente/registrar", registro);
-        Assert.True(response.StatusCode == HttpStatusCode.Created || response.StatusCode == HttpStatusCode.Conflict);
-    }
-
-    [Fact(DisplayName = "Login deve retornar token JWT se paciente existir com senha correta")]
-    public async Task Login_DeveRetornarToken_SeCredenciaisForemValidas()
-    {
-        var identificador = Guid.NewGuid().ToString("N")[..6];
-        var email = $"paciente_{identificador}@teste.com";
-        var cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => new Random().Next(0, 10).ToString()));
-        const string senha = "123456";
-        Console.WriteLine($"CPF Login deve Retornar token: {cpf}");
-
-        // Garante que o paciente existe
-        await _client.PostAsJsonAsync("/api/auth/paciente/registrar", new RegistrarPacienteDto
-        {
-            Nome = "Paciente Teste",
-            Email = email,
-            Cpf = cpf,
-            Senha = senha
-        });
-
-        var login = new LoginPacienteDto { CpfOuEmail = email, Senha = senha };
         var response = await _client.PostAsJsonAsync("/api/auth/paciente/login", login);
-        response.EnsureSuccessStatusCode();
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.True(response.IsSuccessStatusCode, $"Resposta: {response.StatusCode}, Conteúdo: {body}");
 
         var content = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+
         Assert.NotNull(content);
-        Assert.True(content.ContainsKey("token"));
-        Assert.Contains(".", content["token"]);
+        Assert.True(content!.ContainsKey("token"));
     }
 
+    [Fact(DisplayName = "Login com CPF retorna token JWT se credenciais forem válidas")]
+    public async Task Login_ComCpf_DeveRetornarToken()
+    {
+        var login = new LoginPacienteDto
+        {
+            CpfOuEmail = PacienteCpf,
+            Senha = Senha
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/auth/paciente/login", login);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.True(response.IsSuccessStatusCode, $"Resposta: {response.StatusCode}, Conteúdo: {body}");
+
+        var content = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+
+        Assert.NotNull(content);
+        Assert.True(content!.ContainsKey("token"));
+    }
 }

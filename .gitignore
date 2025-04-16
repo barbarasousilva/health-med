@@ -56,7 +56,9 @@ Thumbs.db
 **/Properties/launchSettings.json
 
 # ---- Env ----
-.env
+**/.env.test
+**/.env
+
 
 # ---- Tests ----
 TestResults/

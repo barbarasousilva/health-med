@@ -15,7 +15,13 @@ public class PacienteRepository : IPacienteRepository
     public async Task<Paciente?> ObterPorCpfOuEmailAsync(string cpfOuEmail)
     {
         const string query = @"
-            SELECT * FROM pacientes 
+            SELECT 
+                id, 
+                nome, 
+                cpf, 
+                email, 
+                senhahash AS SenhaHash
+            FROM pacientes 
             WHERE LOWER(email) = LOWER(@Valor) OR cpf = @Valor;
         ";
 
@@ -25,9 +31,16 @@ public class PacienteRepository : IPacienteRepository
     public async Task<Paciente?> ObterPorEmailOuCpfAsync(string email, string cpf)
     {
         const string query = @"
-            SELECT * FROM pacientes 
+            SELECT 
+                id, 
+                nome, 
+                cpf, 
+                email, 
+                senhahash AS SenhaHash
+            FROM pacientes 
             WHERE LOWER(email) = LOWER(@Email) OR cpf = @Cpf;
         ";
+
 
         return await _connection.QueryFirstOrDefaultAsync<Paciente>(query, new { Email = email, Cpf = cpf });
     }

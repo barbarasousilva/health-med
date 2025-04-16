@@ -79,12 +79,10 @@ public class ConsultaTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _clientPaciente.PostAsJsonAsync("/consultas", dto);
         var body = await response.Content.ReadAsStringAsync();
 
-        // extrair o ID da consulta se for retornado
-        // aqui estamos apenas mockando a simulação — o ID real poderia vir via outra rota em produção
         var consultaId = JsonDocument.Parse(body).RootElement
                           .GetProperty("mensagem").GetString();
 
-        return idHorario; // para simulação, vamos cancelar usando o id do horário
+        return idHorario;
     }
 
     [Fact(DisplayName = "Paciente pode cancelar uma consulta com justificativa")]

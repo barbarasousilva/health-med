@@ -17,16 +17,12 @@ using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// Configuração do segredo do JWT
 var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
     ?? throw new Exception("JWT_SECRET não configurado!");
-Console.WriteLine("JWT_SECRET no Program.cs: " + builder.Configuration["JWT_SECRET"]);
 
 var keyBytes = Convert.FromHexString(jwtSecret);
 var key = new SymmetricSecurityKey(keyBytes) { KeyId = "chave-token" };
 
-// Configuração de CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -35,7 +31,6 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 
-// Configuração do Swagger
 builder.Services.AddSwaggerWithJwt();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -43,7 +38,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-// Configuração do JWT e autenticação
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -75,8 +69,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
-// Registros de serviços
 builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPacienteService, PacienteService>();
@@ -95,23 +87,19 @@ builder.Services.AddScoped<IDbConnection>(sp =>
     return factory.CreateConnection();
 });
 
-// Construção do app
 var app = builder.Build();
 
-// Configurações de desenvolvimento
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Middlewares
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Mapear controladores
 app.MapControllers();
 
 app.Run();

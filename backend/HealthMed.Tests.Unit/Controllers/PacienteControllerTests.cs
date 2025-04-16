@@ -46,9 +46,7 @@ public class PacienteControllerTests
         _serviceMock.Setup(s => s.AutenticarPacienteAsync(dto.CpfOuEmail, dto.Senha))
                     .ReturnsAsync((string?)null);
 
-
         var resultado = await _controller.Login(dto) as UnauthorizedObjectResult;
-
 
         Assert.NotNull(resultado);
         Assert.Equal(401, resultado!.StatusCode);
@@ -70,9 +68,7 @@ public class PacienteControllerTests
         _serviceMock.Setup(s => s.RegistrarPacienteAsync(It.IsAny<Paciente>(), dto.Senha))
                     .ReturnsAsync(pacienteId);
 
-
         var resultado = await _controller.Registrar(dto) as CreatedAtActionResult;
-
 
         Assert.NotNull(resultado);
         Assert.Equal(201, resultado!.StatusCode);

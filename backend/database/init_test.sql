@@ -1,8 +1,3 @@
-DROP TABLE IF EXISTS consultas;
-DROP TABLE IF EXISTS horariosdisponiveis;
-DROP TABLE IF EXISTS pacientes;
-DROP TABLE IF EXISTS medicos;
-
 CREATE TABLE medicos (
     id UUID PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
