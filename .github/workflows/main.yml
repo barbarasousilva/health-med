@@ -38,10 +38,20 @@ jobs:
       - name: 🛠️ Build do projeto
         run: dotnet build ./backend/HealthMed.sln --configuration Debug --no-restore
 
-      - name: 📦 Copiar .env.test para bin de testes
+      - name: 🐘 Subir banco PostgreSQL para testes
+        run: |
+          docker run -d \
+            --name pg-test \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=123456 \
+            -e POSTGRES_DB=healthmed_test \
+            -p 5433:5432 \
+            postgres:15
+
+      - name: 📦 Copiar .env.test para bin dos testes
         run: |
           mkdir -p ./backend/HealthMed.Tests.Integration/bin/Debug/net8.0/
-          cp ./backend/HealthMed.Tests.Integration/.env.test ./backend/HealthMed.Tests.Integration/bin/Debug/net8.0/
+          cp ./backend/HealthMed.Tests.Integration/.env.test ./backend/HealthMed.Tests.Integration/bin/Debug/net8.0/.env.test
 
       - name: ✅ Rodar testes (unitários e integração)
         working-directory: ./backend
@@ -71,8 +81,6 @@ jobs:
         working-directory: ./
         run: |
           docker compose -f compose.yml build backend frontend
-          docker tag barbarasousilva/healthmed-backend:latest barbarasousilva/healthmed-backend:latest
-          docker tag barbarasousilva/healthmed-frontend:latest barbarasousilva/healthmed-frontend:latest
           docker push barbarasousilva/healthmed-backend:latest
           docker push barbarasousilva/healthmed-frontend:latest
 
