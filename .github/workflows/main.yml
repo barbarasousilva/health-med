@@ -32,10 +32,6 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: 📦 Copiar .env.test para pasta de testes
-        run: |
-          cp ./backend/.env.test ./backend/HealthMed.Tests.Integration/
-
       - name: 🧪 Restore dependências
         run: dotnet restore ./backend/HealthMed.sln
 
