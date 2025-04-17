@@ -32,6 +32,10 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: 📦 Copiar .env.test para pasta de testes
+        run: |
+          cp ./backend/.env.test ./backend/HealthMed.Tests.Integration/
+
       - name: 🧪 Restore dependências
         run: dotnet restore ./backend/HealthMed.sln
 
@@ -39,7 +43,8 @@ jobs:
         run: dotnet build ./backend/HealthMed.sln --configuration Debug --no-restore
 
       - name: ✅ Rodar testes (unitários e integração)
-        run: dotnet test ./backend/HealthMed.sln --configuration Debug --no-build --verbosity normal
+        working-directory: ./backend
+        run: dotnet test HealthMed.sln --configuration Debug
 
   deploy:
     needs: build-test

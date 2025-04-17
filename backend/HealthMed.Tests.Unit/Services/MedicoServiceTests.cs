@@ -69,7 +69,4 @@ public class MedicoServiceTests
 
         Assert.Equal(2, retorno.Count());
     }
-
-
-
 }

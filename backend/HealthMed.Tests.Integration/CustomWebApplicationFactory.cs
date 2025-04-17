@@ -64,7 +64,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     private static void LoadEnvironmentVariables()
     {
-        var basePath = Directory.GetCurrentDirectory();
+        var basePath = AppContext.BaseDirectory;
         var current = new DirectoryInfo(basePath);
 
         while (current != null && !File.Exists(Path.Combine(current.FullName, ".env.test")))
