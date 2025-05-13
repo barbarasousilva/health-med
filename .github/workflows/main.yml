@@ -66,9 +66,6 @@ jobs:
           echo "Verificando inserts..."
           docker exec -e PGPASSWORD=123456 healthmed-db psql -U postgres -d healthmeddb -c "SELECT COUNT(*) FROM medicos;"  
 
-      - name: 📦 Copiar .env para bin dos testes
-        run: cp ./backend/HealthMed.Tests.Integration/.env ./backend/HealthMed.Tests.Integration/bin/Debug/net8.0
-
       - name: ✅ Rodar testes (unitários e integração)
         working-directory: ./backend
         run: dotnet test HealthMed.sln --configuration Debug

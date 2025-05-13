@@ -15,8 +15,6 @@ namespace HealthMed.Tests.Integration
         {
             builder.UseEnvironment("Development");
 
-            DotNetEnv.Env.Load(".env");
-
             var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
             var dbConnString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
