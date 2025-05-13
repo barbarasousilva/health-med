@@ -15,8 +15,16 @@ namespace HealthMed.Tests.Integration
         {
             builder.UseEnvironment("Development");
 
-            Environment.SetEnvironmentVariable("JWT_SECRET", "8f3d7234f8c84f189f09a7c4be8b0d2e13b6f5b241f7416abfd3343f6c2f6b2a");
-            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", "Host=localhost;Port=5432;Username=postgres;Password=123456;Database=healthmeddb");
+            DotNetEnv.Env.Load(".env");
+
+            var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
+            var dbConnString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            if (string.IsNullOrEmpty(jwtSecret) || string.IsNullOrEmpty(dbConnString))
+                throw new Exception("JWT_SECRET ou DB_CONNECTION_STRING não estão definidas no ambiente.");
+
+            Environment.SetEnvironmentVariable("JWT_SECRET", jwtSecret);
+            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", dbConnString);
         }
 
     }
