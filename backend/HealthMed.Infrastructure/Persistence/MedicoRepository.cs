@@ -55,7 +55,7 @@ public class MedicoRepository : IMedicoRepository
 
         if (!string.IsNullOrWhiteSpace(filtro.Especialidade))
         {
-            sql.Append(" AND unaccent(especialidade) ILIKE unaccent(@Especialidade)");
+            sql.Append(" AND especialidade ILIKE @Especialidade)");
             parameters.Add("Especialidade", $"%{filtro.Especialidade}%");
         }
 
