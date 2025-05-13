@@ -4,6 +4,14 @@
 
 ---
 
+## 🎥 Demonstração
+
+Você pode assistir a uma demonstração da aplicação no link abaixo:
+
+🔗 [Assista à demonstração do Health&Med](https://drive.google.com/file/d/1MMQND_aoaRipQDGoxK6axFgRJeK15zST/view?usp=sharing)
+
+---
+
 ## 🔍 Funcionalidades
 
 ### Pacientes
@@ -31,7 +39,7 @@
 | Backend      | .NET 8 Web API, Clean Architecture, Dapper, JWT                       |
 | Banco        | PostgreSQL                                                            |
 | Infra        | Docker, Docker Compose, Kubernetes (AKS), GitHub Actions             |
-| Testes       | xUnit (.NET), Testes de Integração com banco real                    |
+| Testes       | xUnit (.NET), Testes de Integração com banco real, launchSettings    |
 | CI/CD        | Build, test, push e deploy automático via GitHub Actions             |
 
 ---
@@ -41,10 +49,12 @@
 ```
 health-med/
 ├── backend/         # Solução .NET 8 com Domain, Application, API e Tests
+│   ├── HealthMed.Tests.Unit
+│   └── HealthMed.Tests.Integration  # Com suporte a launchSettings.json
 ├── frontend/        # SPA React com Vite e Tailwind
 ├── k8s/             # Manifests do Kubernetes (Deployments, Services, ConfigMaps...)
 ├── docs/            # Documentação do projeto (arquitetura, pipeline, etc)
-├── scripts/         # Shell scripts para publicação de imagens e restauração local
+├── scripts/         # Shell scripts para publicação de imagens e testes locais
 ├── compose.yml      # Docker Compose para ambiente local
 ├── .github/workflows/  # CI com GitHub Actions
 ```
@@ -54,17 +64,29 @@ health-med/
 ## 🧪 Testes
 
 - Testes de unidade com xUnit e Moq
-- Testes de integração com banco PostgreSQL real (via docker-compose)
-- Pipeline executa os testes antes de qualquer deploy
+- Testes de integração com banco PostgreSQL real (via Docker)
+- Uso de `CustomWebApplicationFactory` com injeção de variáveis via ambiente
+- `launchSettings.json` no projeto de integração para centralizar configuração local
 
-### 🧪 Testes Locais
-
-Os testes (unitários e de integração) estão disponíveis no repositório e são executados automaticamente na pipeline de CI/CD.  
-Eles também podem ser rodados manualmente localmente:
-
+### ✅ Execução local dos testes
 ```bash
-dotnet test ./backend/HealthMed.Tests.Unit
-dotnet test ./backend/HealthMed.Tests.Integration
+# Subir banco de dados com init.sql
+docker run -d --name healthmed-db-local \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=123456 \
+  -e POSTGRES_DB=healthmeddb \
+  -p 5432:5432 \
+  -v $(pwd)/database/init.sql:/docker-entrypoint-initdb.d/init.sql \
+  postgres:15
+
+# Exportar variáveis de ambiente
+export JWT_SECRET=...
+export DB_CONNECTION_STRING="Host=localhost;Port=5432;..."
+export ASPNETCORE_ENVIRONMENT=Development
+
+# Executar testes
+cd backend
+dotnet test HealthMed.sln
 ```
 
 ---
@@ -72,9 +94,11 @@ dotnet test ./backend/HealthMed.Tests.Integration
 ## ☁️ CI/CD e Deploy
 
 - CI executado em todo push ou PR para a branch `main`
-- Build e push das imagens Docker no Docker Hub
+- Build e push de imagens Docker no Docker Hub
 - Deploy automático no AKS com `kubectl apply -f k8s/`
-- Proteção contra merge caso os testes falhem
+- Secrets lidos do GitHub Actions (JWT, conexão com o banco)
+- Testes de unidade e integração rodando na pipeline
+- Merge bloqueado em caso de falha nos testes
 
 ---
 
@@ -82,8 +106,9 @@ dotnet test ./backend/HealthMed.Tests.Integration
 
 - JWT com expiração e roles (`médico`, `paciente`)
 - Middleware de autorização por perfil
-- Senhas com hash SHA256
-- Variáveis sensíveis em `.env` + Secrets do K8s
+- Senhas com hash via BCrypt
+- Variáveis sensíveis com `Environment.GetEnvironmentVariable()`
+- Secrets gerenciados via `.env`, GitHub Actions e Kubernetes Secrets
 
 ---
 
@@ -91,6 +116,7 @@ dotnet test ./backend/HealthMed.Tests.Integration
 
 ### Requisitos
 - Docker e Docker Compose
+- .NET 8 SDK (para rodar testes)
 
 ### Passos
 ```bash
@@ -107,14 +133,14 @@ Acesso local:
 
 ## ☸️ Deploy no Kubernetes (AKS)
 
-> O deploy está automatizado via pipeline, mas pode ser feito manualmente:
+> O deploy está automatizado via pipeline, mas também pode ser feito manualmente:
 
 ```bash
 az aks get-credentials --resource-group health-med-rg --name healthmed-aks
 kubectl apply -f k8s/
 ```
 
-Para rollback:
+Rollback:
 ```bash
 kubectl rollout undo deployment/backend
 kubectl rollout undo deployment/frontend
@@ -122,44 +148,51 @@ kubectl rollout undo deployment/frontend
 
 ---
 
-## 🔐 Variáveis de Ambiente e Arquivos Sensíveis
+## 🔐 Variáveis de Ambiente e Secrets
 
-Este projeto utiliza arquivos `.env` e `secrets.yaml` para armazenar configurações sensíveis (como JWT, conexão com banco e chaves). Por segurança:
+O projeto utiliza `.env` para ambientes locais e `GitHub Secrets` + `Kubernetes Secrets` em produção.
 
-- **`.env`** e **`k8s/secrets.yaml`** NÃO devem ser versionados. Ambos já estão listados no `.gitignore`
-- Um exemplo de variáveis está disponível em [`.env.example`](./.env.example)
-
-### Como criar o seu `.env`
-```bash
-cp .env.example .env
+### Exemplo de `.env`:
+```env
+JWT_SECRET=seu_token_jwt
+DB_CONNECTION_STRING=Host=localhost;Port=5432;...
+ASPNETCORE_ENVIRONMENT=Development
 ```
 
-### Como gerar os secrets no Kubernetes manualmente:
+### Criar manualmente os secrets no cluster:
 ```bash
 kubectl create secret generic secrets \
-  --from-literal=DB_USER=postgres \
-  --from-literal=DB_PASS=your_password \
-  --from-literal=DB_CONNECTION_STRING="Host=db;Port=5432;Database=healthmeddb;Username=postgres;Password=your_password" \
-  --from-literal=JWT_SECRET=your_jwt_secret_here
+  --from-literal=JWT_SECRET=... \
+  --from-literal=DB_CONNECTION_STRING=...
 ```
-
-> O arquivo `secrets.yaml` pode ser recriado com base nas variáveis do `.env`. Documentado para garantir consistência entre os ambientes.
 
 ---
 
 ## 📄 Documentação
 - [`docs/arquitetura.md`](./docs/arquitetura.md): Arquitetura do sistema
-- [`docs/pipeline.md`](./docs/pipeline.md): CI/CD, deploy e rollback
+- [`docs/pipeline.md`](./docs/pipeline.md): CI/CD, deploy, rollback, testes
 
 ---
 
 ## 🙋‍♀️ Autoria
+
 **Bárbara da Silva**  
 [LinkedIn](https://www.linkedin.com/in/barbarasousilva) • Full Stack Engineer • Especialista em Arquitetura .NET
 
 ---
 
 ## ✅ Status do Projeto
-**Concluído** – Em ambiente real (AKS) com CI/CD, testes e infraestrutura documentada.  
-Pronto para evolução, extensão de funcionalidades e escalabilidade em produção.
 
+**Concluído** – Rodando com CI/CD completo, testes automatizados, arquitetura limpa e pronto para escalar em produção com AKS.
+
+
+
+
+
+
+
+
+
+
+
+Bus

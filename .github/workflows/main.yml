@@ -12,8 +12,9 @@ jobs:
 
     env:
       DOCKER_BUILDKIT: 1
-      JWT_SECRET_TEST: ${{ secrets.JWT_SECRET_TEST }}
-      DB_CONNECTION_STRING_TEST: ${{ secrets.DB_CONNECTION_STRING_TEST }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+      ASPNETCORE_ENVIRONMENT: Development
 
     steps:
       - name: 🔄 Checkout do repositório
@@ -38,15 +39,15 @@ jobs:
       - name: 🛠️ Build do projeto
         run: dotnet build ./backend/HealthMed.sln --configuration Debug --no-restore
 
-      - name: 🐘 Subir banco PostgreSQL para testes
+      - name: 🐘 Subir banco PostgreSQL
         run: |
           docker run -d \
-            --name pg-test \
+            --name healthmed-db \
             -e POSTGRES_USER=postgres \
             -e POSTGRES_PASSWORD=123456 \
-            -e POSTGRES_DB=healthmed_test \
-            -p 5433:5432 \
-            -v ${{ github.workspace }}/backend/database/init_test.sql:/docker-entrypoint-initdb.d/init.sql \
+            -e POSTGRES_DB=healthmeddb \
+            -p 5432:5432 \
+            -v ${{ github.workspace }}/database/init.sql:/docker-entrypoint-initdb.d/init.sql \
             postgres:15
           echo "Aguardando banco subir..."
           sleep 10
@@ -54,15 +55,15 @@ jobs:
       - name: 🧪 Validar conexão com PostgreSQL de testes
         run: |
           echo "Verificando se o banco está acessível..."
-          docker exec pg-test pg_isready -U postgres
+          docker exec healthmed-db pg_isready -U postgres
 
           echo "Listando tabelas..."
-          docker exec -e PGPASSWORD=123456 pg-test psql -U postgres -d healthmed_test -c "\dt"
+          docker exec -e PGPASSWORD=123456 healthmed-db psql -U postgres -d healthmeddb -c "\dt"
 
           echo "Verificando inserts..."
-          docker exec -e PGPASSWORD=123456 pg-test psql -U postgres -d healthmed_test -c "SELECT COUNT(*) FROM medicos;"  
+          docker exec -e PGPASSWORD=123456 healthmed-db psql -U postgres -d healthmeddb -c "SELECT COUNT(*) FROM medicos;"  
 
-      - name: 📦 Copiar .env.test para bin dos testes
+      - name: 📦 Copiar .env para bin dos testes
         run: cp ./backend/HealthMed.Tests.Integration/.env.test ./backend/HealthMed.Tests.Integration/bin/Debug/net8.0
 
       - name: ✅ Rodar testes (unitários e integração)
