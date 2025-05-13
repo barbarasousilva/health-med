@@ -47,10 +47,13 @@ jobs:
             -e POSTGRES_PASSWORD=123456 \
             -e POSTGRES_DB=healthmeddb \
             -p 5432:5432 \
-            -v ${{ github.workspace }}/database/init.sql:/docker-entrypoint-initdb.d/init.sql \
+            -v ${{ github.workspace }}/backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql \
             postgres:15
           echo "Aguardando banco subir..."
           sleep 10
+
+      - name: 📋 Mostrar logs do container
+        run: docker logs healthmed-db || true
 
       - name: 🧪 Validar conexão com PostgreSQL de testes
         run: |

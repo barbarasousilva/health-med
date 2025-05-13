@@ -7,8 +7,8 @@ COPY HealthMed.Api/ ./HealthMed.Api/
 COPY HealthMed.Application/ ./HealthMed.Application/
 COPY HealthMed.Domain/ ./HealthMed.Domain/
 COPY HealthMed.Infrastructure/ ./HealthMed.Infrastructure/
-COPY HealthMed.Tests.Integration/ .HealthMed.Tests.Integration/
-COPY HealthMed.Tests.Unit/ .HealthMed.Tests.Unit/
+COPY HealthMed.Tests.Integration/ ./HealthMed.Tests.Integration/
+COPY HealthMed.Tests.Unit/ ./HealthMed.Tests.Unit/
 
 RUN dotnet restore
 RUN dotnet publish HealthMed.Api/HealthMed.Api.csproj -c Release -o /out

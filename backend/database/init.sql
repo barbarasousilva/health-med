@@ -64,8 +64,8 @@ VALUES (
 );
 
 INSERT INTO horariosdisponiveis (id, medicoid, datahora, datahorafim, status) VALUES
-('51a3654a-ec43-4efc-a02c-38c9e3a30527', '00000000-0000-0000-0000-000000000001', '2025-07-24 10:00:00', '2025-07-24 10:30:00', 'Disponivel'),
-('c91f75ea-c8ac-4ed0-b236-27716e248fb9', '00000000-0000-0000-0000-000000000001', '2025-07-24 11:00:00', '2025-07-24 11:30:00', 'Disponivel');
+('51a3654a-ec43-4efc-a02c-38c9e3a30527', '00000000-0000-0000-0000-000000000001', '2025-08-24 10:00:00', '2025-07-24 10:30:00', 'Disponivel'),
+('c91f75ea-c8ac-4ed0-b236-27716e248fb9', '00000000-0000-0000-0000-000000000001', '2025-08-24 11:00:00', '2025-07-24 11:30:00', 'Disponivel');
 
 INSERT INTO consultas (
     id, pacienteid, medicoid, horarioid, status, justificativacancelamento, criadoem, datarespostamedico, datacancelamento
@@ -76,7 +76,7 @@ INSERT INTO consultas (
     '51a3654a-ec43-4efc-a02c-38c9e3a30527',
     'Confirmada',
     NULL,
-    '2025-06-22 17:55:10',
+    '2025-08-22 17:55:10',
     NULL,
     NULL
 );
