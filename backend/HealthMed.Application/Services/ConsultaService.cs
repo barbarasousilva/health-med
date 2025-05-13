@@ -1,4 +1,5 @@
 using Domain.Entities;
+using HealthMed.Application.DTOs;
 using HealthMed.Domain.Enums;
 using HealthMed.Domain.Interfaces;
 
@@ -12,12 +13,12 @@ public class ConsultaService : IConsultaService
     {
         _consulta = consulta;
     }
-    public async Task<IEnumerable<object>> ListarPorStatusAsync(Guid medicoId, StatusConsulta status)
+    public async Task<IEnumerable<Consulta>> ListarPorStatusAsync(Guid medicoId, StatusConsulta status)
     {
         return await _consulta.ListarPorStatusAsync(medicoId, status);
     }
 
-    public async Task AgendarConsultaAsync(Guid idPaciente, Guid idMedico, Guid idHorarioDisponivel)
+    public async Task<Guid> AgendarConsultaAsync(Guid idPaciente, Guid idMedico, Guid idHorarioDisponivel)
     {
         if (await _consulta.HorarioJaAgendadoAsync(idHorarioDisponivel))
             throw new InvalidOperationException("Este horário já está agendado.");
@@ -28,11 +29,12 @@ public class ConsultaService : IConsultaService
             IdPaciente = idPaciente,
             IdMedico = idMedico,
             IdHorarioDisponivel = idHorarioDisponivel,
-            DataAgendamento = DateTime.UtcNow,
-            Status = StatusConsulta.Pendente
+            Status = StatusConsulta.Pendente,
+            DataAgendamento = DateTime.UtcNow
         };
 
         await _consulta.AdicionarAsync(consulta);
+        return consulta.Id;
     }
 
     public async Task CancelarConsultaAsync(Guid idConsulta, string justificativa)

@@ -10,6 +10,7 @@ using HealthMed.API.Controllers;
 using HealthMed.Domain.Enums;
 using HealthMed.Domain.Interfaces;
 using HealthMed.Application.DTOs;
+using Domain.Entities;
 
 namespace HealthMed.Tests.Unit.Controllers;
 
@@ -48,7 +49,7 @@ public class ConsultaControllerTests
 
         _serviceMock.Setup(s =>
             s.AgendarConsultaAsync(_usuarioId, dto.IdMedico, dto.IdHorarioDisponivel)
-        ).Returns(Task.CompletedTask);
+        ).ReturnsAsync(Guid.NewGuid());
 
         var resultado = await _controller.AgendarConsulta(dto) as OkObjectResult;
 
@@ -78,9 +79,18 @@ public class ConsultaControllerTests
     public async Task ListarConsultasPendentes_DeveRetornarOk()
     {
         var medicoId = Guid.NewGuid();
-        var pendenteMock = new List<object>
+        var pendenteMock = new List<Consulta>
         {
-            new { Id = Guid.NewGuid(), Status = StatusConsulta.Pendente }
+            new Consulta
+            {
+                Id = Guid.NewGuid(),
+                IdMedico = medicoId,
+                IdPaciente = Guid.NewGuid(),
+                IdHorarioDisponivel = Guid.NewGuid(),
+                Status = StatusConsulta.Pendente,
+                DataAgendamento = DateTime.UtcNow,
+                JustificativaCancelamento = ""
+            }
         };
 
         var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
@@ -97,11 +107,14 @@ public class ConsultaControllerTests
         _serviceMock.Setup(s => s.ListarPorStatusAsync(medicoId, StatusConsulta.Pendente))
             .ReturnsAsync(pendenteMock);
 
-        var resultado = await _controller.ListarConsultasPendentes(_serviceMock.Object) as OkObjectResult;
+        var resultado = await _controller.ListarConsultasPendentes() as OkObjectResult;
 
         Assert.NotNull(resultado);
         Assert.Equal(200, resultado!.StatusCode);
-        Assert.Equal(pendenteMock, resultado.Value);
+        var retorno = Assert.IsType<List<ConsultaDto>>(resultado!.Value);
+        Assert.Single(retorno);
+        Assert.Equal(StatusConsulta.Pendente, retorno[0].Status);
+        Assert.Equal(pendenteMock[0].Id, retorno[0].Id);
     }
 
     [Fact(DisplayName = "AceitarConsulta deve retornar 200 OK")]

@@ -15,20 +15,12 @@ public class ConsultaRepository : IConsultaRepository
     {
         _connection = connection;
     }
-    public async Task<IEnumerable<Consulta>> ListarPorStatusAsync(Guid idMedico, StatusConsulta status)
+    public async Task<IEnumerable<Consulta>> ListarPorStatusAsync(Guid medicoId, StatusConsulta status)
     {
-        var sql = @"SELECT * FROM consultas 
-                WHERE medicoid = @idMedico 
-                  AND status = @status";
-
-        var rows = await _connection.QueryAsync<ConsultaRaw>(sql, new
-        {
-            idMedico,
-            status = status.ToString()
-        });
-
-        return rows.Select(MapearConsulta);
+        var query = @"SELECT * FROM Consultas WHERE MedicoId = @MedicoId AND Status = @Status";
+        return await _connection.QueryAsync<Consulta>(query, new { MedicoId = medicoId, Status = status.ToString() });
     }
+
 
     public async Task AdicionarAsync(Consulta consulta)
     {
@@ -108,28 +100,29 @@ public class ConsultaRepository : IConsultaRepository
     {
         return new Consulta
         {
-            Id = raw.id,
-            IdPaciente = raw.pacienteid,
-            IdMedico = raw.medicoid,
-            IdHorarioDisponivel = raw.horarioid,
-            DataAgendamento = raw.criadoem,
-            Status = Enum.Parse<StatusConsulta>(raw.status, ignoreCase: true),
-            JustificativaCancelamento = raw.justificativacancelamento,
-            DataRespostaMedico = raw.datarespostamedico,
-            DataCancelamento = raw.datacancelamento
+            Id = raw.Id,
+            IdPaciente = raw.PacienteId,
+            IdMedico = raw.MedicoId,
+            IdHorarioDisponivel = raw.HorarioDisponivelId,
+            DataAgendamento = raw.DataAgendamento,
+            Status = Enum.Parse<StatusConsulta>(raw.Status, ignoreCase: true),
+            JustificativaCancelamento = raw.JustificativaCancelamento,
+            DataRespostaMedico = raw.DataRespostaMedico,
+            DataCancelamento = raw.DataCancelamento
         };
     }
 
     private class ConsultaRaw
     {
-        public Guid id { get; set; }
-        public Guid pacienteid { get; set; }
-        public Guid medicoid { get; set; }
-        public Guid horarioid { get; set; }
-        public string status { get; set; } = string.Empty;
-        public string? justificativacancelamento { get; set; }
-        public DateTime criadoem { get; set; }
-        public DateTime? datarespostamedico { get; set; }
-        public DateTime? datacancelamento { get; set; }
+        public Guid Id { get; set; }
+        public Guid PacienteId { get; set; }
+        public Guid MedicoId { get; set; }
+        public Guid HorarioDisponivelId { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public string? JustificativaCancelamento { get; set; }
+        public DateTime DataAgendamento { get; set; }
+        public DateTime? DataRespostaMedico { get; set; }
+        public DateTime? DataCancelamento { get; set; }
     }
+
 }

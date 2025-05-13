@@ -46,10 +46,10 @@ DELETE FROM medicos;
 INSERT INTO medicos (id, nome, crm, especialidade, senhahash, cidade, uf)
 VALUES (
     '00000000-0000-0000-0000-000000000001',
-    'Médico Teste',
+    'MÃ©dico Teste',
     '123456',
-    'Clínico Geral',
-    '$2a$11$EfIb7BgzMznwSc1BtWGBgOi8aMi/zqFvX7F/yaC4t20fGZ0GH8.q2',
+    'ClÃ­nico Geral',
+    '$2a$11$s8Dzxm1.i5I7Y.iQjQ3Gg.xDsVHxfneAdsUdvRMw9.mLEYqfK0QRW',
     'Belo Horizonte',
     'MG'
 );
@@ -60,7 +60,7 @@ VALUES (
     'Paciente Teste',
     '12345678901',
     'paciente@teste.com',
-    '$2a$11$EfIb7BgzMznwSc1BtWGBgOi8aMi/zqFvX7F/yaC4t20fGZ0GH8.q2'
+    '$2a$11$s8Dzxm1.i5I7Y.iQjQ3Gg.xDsVHxfneAdsUdvRMw9.mLEYqfK0QRW'
 );
 
 INSERT INTO horariosdisponiveis (id, medicoid, datahora, datahorafim, status)
@@ -80,13 +80,13 @@ INSERT INTO consultas (
     datacancelamento
 )
 VALUES (
-    '00000000-0000-0000-0000-000000000301', -- id da consulta
-    '00000000-0000-0000-0000-000000000002', -- paciente de teste
-    '00000000-0000-0000-0000-000000000001', -- médico de teste
-    '00000000-0000-0000-0000-000000000101', -- horário disponível de teste
-    'Confirmada',                           -- status
-    NULL,                                   -- justificativaCancelamento
-    '2025-04-20 08:00:00',                  -- criadoem
-    NULL,                                   -- datarespostamedico
-    NULL                                    -- datacancelamento
+    '00000000-0000-0000-0000-000000000301',
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000101',
+    'Confirmada',
+    NULL,
+    '2025-04-20 08:00:00',
+    NULL,
+    NULL
 );

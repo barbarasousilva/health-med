@@ -46,12 +46,24 @@ jobs:
             -e POSTGRES_PASSWORD=123456 \
             -e POSTGRES_DB=healthmed_test \
             -p 5433:5432 \
+            -v ${{ github.workspace }}/backend/database/init_test.sql:/docker-entrypoint-initdb.d/init.sql \
             postgres:15
+          echo "Aguardando banco subir..."
+          sleep 10
+
+      - name: 🧪 Validar conexão com PostgreSQL de testes
+        run: |
+          echo "Verificando se o banco está acessível..."
+          docker exec pg-test pg_isready -U postgres
+
+          echo "Listando tabelas..."
+          docker exec -e PGPASSWORD=123456 pg-test psql -U postgres -d healthmed_test -c "\dt"
+
+          echo "Verificando inserts..."
+          docker exec -e PGPASSWORD=123456 pg-test psql -U postgres -d healthmed_test -c "SELECT COUNT(*) FROM medicos;"  
 
       - name: 📦 Copiar .env.test para bin dos testes
-        run: |
-          mkdir -p ./backend/HealthMed.Tests.Integration/bin/Debug/net8.0/
-          cp ./backend/HealthMed.Tests.Integration/.env.test ./backend/HealthMed.Tests.Integration/bin/Debug/net8.0/.env.test
+        run: cp ./backend/HealthMed.Tests.Integration/.env.test ./backend/HealthMed.Tests.Integration/bin/Debug/net8.0
 
       - name: ✅ Rodar testes (unitários e integração)
         working-directory: ./backend

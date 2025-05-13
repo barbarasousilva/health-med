@@ -1,4 +1,5 @@
 using HealthMed.Domain.Entities;
+using HealthMed.Domain.Filters;
 
 namespace HealthMed.Application.Services
 {

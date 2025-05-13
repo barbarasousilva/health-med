@@ -1,8 +1,3 @@
-DROP TABLE IF EXISTS consultas;
-DROP TABLE IF EXISTS horariosdisponiveis;
-DROP TABLE IF EXISTS pacientes;
-DROP TABLE IF EXISTS medicos;
-
 CREATE TABLE medicos (
     id UUID PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -54,7 +49,7 @@ VALUES (
     'Médico Teste',
     '123456',
     'Clínico Geral',
-    '$2a$11$EfIb7BgzMznwSc1BtWGBgOi8aMi/zqFvX7F/yaC4t20fGZ0GH8.q2',
+    '$2a$11$s8Dzxm1.i5I7Y.iQjQ3Gg.xDsVHxfneAdsUdvRMw9.mLEYqfK0QRW',
     'Belo Horizonte',
     'MG'
 );
@@ -65,33 +60,23 @@ VALUES (
     'Paciente Teste',
     '12345678901',
     'paciente@teste.com',
-    '$2a$11$EfIb7BgzMznwSc1BtWGBgOi8aMi/zqFvX7F/yaC4t20fGZ0GH8.q2'
+    '$2a$11$s8Dzxm1.i5I7Y.iQjQ3Gg.xDsVHxfneAdsUdvRMw9.mLEYqfK0QRW'
 );
 
-INSERT INTO horariosdisponiveis (id, medicoid, datahora, datahorafim, status)
-VALUES 
-    ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', '2025-04-20 10:00:00', '2025-04-20 10:30:00', 'Disponivel'),
-    ('00000000-0000-0000-0000-000000000102', '00000000-0000-0000-0000-000000000001', '2025-04-20 11:00:00', '2025-04-20 11:30:00', 'Disponivel');
+INSERT INTO horariosdisponiveis (id, medicoid, datahora, datahorafim, status) VALUES
+('51a3654a-ec43-4efc-a02c-38c9e3a30527', '00000000-0000-0000-0000-000000000001', '2025-07-24 10:00:00', '2025-07-24 10:30:00', 'Disponivel'),
+('c91f75ea-c8ac-4ed0-b236-27716e248fb9', '00000000-0000-0000-0000-000000000001', '2025-07-24 11:00:00', '2025-07-24 11:30:00', 'Disponivel');
 
 INSERT INTO consultas (
-    id,
-    pacienteid,
-    medicoid,
-    horarioid,
-    status,
-    justificativacancelamento,
-    criadoem,
-    datarespostamedico,
-    datacancelamento
-)
-VALUES (
-    '00000000-0000-0000-0000-000000000301', -- id da consulta
-    '00000000-0000-0000-0000-000000000002', -- paciente de teste
-    '00000000-0000-0000-0000-000000000001', -- médico de teste
-    '00000000-0000-0000-0000-000000000101', -- horário disponível de teste
-    'Confirmada',                           -- status
-    NULL,                                   -- justificativaCancelamento
-    '2025-04-20 08:00:00',                  -- criadoem
-    NULL,                                   -- datarespostamedico
-    NULL                                    -- datacancelamento
+    id, pacienteid, medicoid, horarioid, status, justificativacancelamento, criadoem, datarespostamedico, datacancelamento
+) VALUES (
+    '00000000-0000-0000-0000-000000000301',
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000001',
+    '51a3654a-ec43-4efc-a02c-38c9e3a30527',
+    'Confirmada',
+    NULL,
+    '2025-06-22 17:55:10',
+    NULL,
+    NULL
 );

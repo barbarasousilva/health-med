@@ -1,4 +1,5 @@
-﻿using HealthMed.Domain.Interfaces;
+﻿using HealthMed.Application.DTOs;
+using HealthMed.Domain.Interfaces;
 
 namespace HealthMed.Application.Services;
 

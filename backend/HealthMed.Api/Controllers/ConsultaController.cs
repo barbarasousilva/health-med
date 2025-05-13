@@ -10,7 +10,7 @@ using System.Security.Claims;
 namespace HealthMed.API.Controllers;
 
 [ApiController]
-[Route("consultas")]
+[Route("api/consultas")]
 public class ConsultaController : ControllerBase
 {
     private readonly IConsultaService _consultaService;
@@ -28,8 +28,13 @@ public class ConsultaController : ControllerBase
         var idPaciente = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (idPaciente == null) return Unauthorized();
 
-        await _consultaService.AgendarConsultaAsync(Guid.Parse(idPaciente), dto.IdMedico, dto.IdHorarioDisponivel);
-        return Ok(new { mensagem = "Consulta agendada com sucesso." });
+        var consultaId = await _consultaService.AgendarConsultaAsync(Guid.Parse(idPaciente), dto.IdMedico, dto.IdHorarioDisponivel);
+
+        return Ok(new
+        {
+            mensagem = "Consulta agendada com sucesso.",
+            id = consultaId
+        });
     }
 
     [HttpPut("{id}/cancelar")]
@@ -40,13 +45,25 @@ public class ConsultaController : ControllerBase
         return Ok(new { mensagem = "Consulta cancelada com sucesso." });
     }
 
+    [HttpGet("pendentes")]
     [Authorize(Roles = "medico")]
-    [HttpGet("consultas/pendentes")]
-    public async Task<IActionResult> ListarConsultasPendentes([FromServices] IConsultaService consultaService)
+    public async Task<IActionResult> ListarConsultasPendentes()
     {
         var medicoId = User.GetMedicoId();
-        var consultasPendentes = await consultaService.ListarPorStatusAsync(medicoId, StatusConsulta.Pendente);
-        return Ok(consultasPendentes);
+        var consultas = await _consultaService.ListarPorStatusAsync(medicoId, StatusConsulta.Pendente);
+
+        var consultasDto = consultas.Select(c => new ConsultaDto
+        {
+            Id = c.Id,
+            MedicoId = c.IdMedico,
+            PacienteId = c.IdPaciente,
+            HorarioDisponivelId = c.IdHorarioDisponivel,
+            Status = c.Status,
+            DataAgendamento = c.DataAgendamento,
+            JustificativaCancelamento = c.JustificativaCancelamento ?? string.Empty
+        }).ToList();
+
+        return Ok(consultasDto);
     }
 
     [HttpPut("{id}/aceitar")]

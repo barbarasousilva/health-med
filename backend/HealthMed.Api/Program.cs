@@ -1,5 +1,6 @@
 using System.Data;
 using System.Text;
+using System.Text.Json.Serialization;
 using DotNetEnv;
 using HealthMed.Api.Extensions;
 using HealthMed.Infrastructure.Persistence;
@@ -12,15 +13,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Repositories;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
-    ?? throw new Exception("JWT_SECRET não configurado!");
+var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new Exception("JWT_SECRET não configurado!");
 
-var keyBytes = Convert.FromHexString(jwtSecret);
+var keyBytes = Encoding.UTF8.GetBytes(jwtSecret);
 var key = new SymmetricSecurityKey(keyBytes) { KeyId = "chave-token" };
 
 builder.Services.AddCors(options =>
@@ -78,6 +77,7 @@ builder.Services.AddScoped<IConsultaService, ConsultaService>();
 builder.Services.AddScoped<ConsultaService>();
 builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
 builder.Services.AddScoped<MedicoService>();
+builder.Services.AddScoped<IMedicoService, MedicoService>();
 builder.Services.AddScoped<IHorarioDisponivelRepository, HorarioDisponivelRepository>();
 builder.Services.AddScoped<IHorarioDisponivelService, HorarioDisponivelService>();
 builder.Services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
@@ -89,11 +89,9 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();

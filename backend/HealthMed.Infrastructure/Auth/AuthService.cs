@@ -29,7 +29,7 @@ public class AuthService : IAuthService
         if (string.IsNullOrEmpty(jwtSecret))
             throw new InvalidOperationException("JWT_SECRET não configurado.");
 
-        var keyBytes = Convert.FromHexString(jwtSecret);
+        var keyBytes = Encoding.UTF8.GetBytes(jwtSecret);
         var key = new SymmetricSecurityKey(keyBytes) { KeyId = "chave-token" };
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
