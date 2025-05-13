@@ -13,11 +13,13 @@ spec:
           image: postgres:15
           command: ["sh", "-c"]
           args:
-            - |
-              echo "Esperando o banco iniciar...";
-              until pg_isready -h postgres -p 5432; do sleep 2; done;
-              echo "Conectado. Executando script...";
-              psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -f /scripts/init.sql;
+              - |
+                echo "Esperando o banco iniciar...";
+                until pg_isready -h postgres -p 5432; do sleep 2; done;
+                echo "Conectado. Executando script...";
+                psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f /scripts/init.sql && echo "✅ Script executado com sucesso.";
+                echo "Finalizando container de init com sucesso."; exit 0;
+
           env:
             - name: POSTGRES_USER
               valueFrom:
