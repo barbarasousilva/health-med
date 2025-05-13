@@ -46,9 +46,9 @@ DELETE FROM medicos;
 INSERT INTO medicos (id, nome, crm, especialidade, senhahash, cidade, uf)
 VALUES (
     '00000000-0000-0000-0000-000000000001',
-    'Médico Teste',
+    'MÃ©dico Teste',
     '123456',
-    'Clínico Geral',
+    'ClÃ­nico Geral',
     '$2a$11$s8Dzxm1.i5I7Y.iQjQ3Gg.xDsVHxfneAdsUdvRMw9.mLEYqfK0QRW',
     'Belo Horizonte',
     'MG'
