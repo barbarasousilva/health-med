@@ -92,7 +92,7 @@ jobs:
 
       - name: 📦 Build e Push com Docker Compose
         run: |
-          docker compose -f compose.yml build backend frontend
+          docker compose -f compose.yaml build backend frontend
           docker push barbarasousilva/healthmed-backend:latest
           docker push barbarasousilva/healthmed-frontend:latest
 
