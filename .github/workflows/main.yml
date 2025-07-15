@@ -32,7 +32,8 @@ jobs:
 
       - name: ✅ Rodar testes unitários com cobertura
         working-directory: ./backend
-        run: dotnet test HealthMed.Tests.Unit/HealthMed.Tests.Unit.csproj \
+        run: | 
+         dotnet test HealthMed.Tests.Unit/HealthMed.Tests.Unit.csproj \
           --collect:"XPlat Code Coverage" \
           --results-directory ./TestResults \
           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
