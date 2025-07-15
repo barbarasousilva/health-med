@@ -44,7 +44,7 @@ jobs:
           name: cobertura-unit-tests
           path: backend/TestResults/**/coverage.cobertura.xml
 
-      - name: 📈 Gerar e exibir resumo da cobertura
+      - name: 📈 Gerar resumo da cobertura
         run: |
             dotnet tool install --global dotnet-reportgenerator-globaltool
             export PATH="$PATH:/home/runner/.dotnet/tools"
@@ -53,8 +53,10 @@ jobs:
               -targetdir: backend/TestResults/coverage-report \
                       -reporttypes: TextSummary
 
-            echo "📄 Cobertura de código:"
+      - name: 📈 Exibir cobertura no log da pipeline
+        run: |
             cat backend/TestResults/coverage-report/Summary.txt || echo "Resumo não encontrado."
+
 
       - name: ✅ CI finalizada com sucesso!
         run: |
