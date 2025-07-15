@@ -75,7 +75,6 @@ jobs:
             name: cobertura-html
             path: backend/TestResults/coverage-report/index.html
 
-
       - name: ✅ CI finalizada com sucesso!
         run: |
           echo "======================================="
