@@ -62,12 +62,18 @@ jobs:
           reportgenerator \
             -reports:"$REPORT_FILE" \
             -targetdir:"TestResults/coverage-report" \
-            -reporttypes:"TextSummary"
+            -reporttypes:"TextSummary;HtmlInline_AzurePipelines_Dark"
 
       - name: 📈 Exibir cobertura no log da pipeline
         working-directory: ./backend
         run: |
             cat TestResults/coverage-report/Summary.txt || echo "Resumo não encontrado."
+
+      - name: 📤 Publicar cobertura visual (HTML)
+        uses: actions/upload-artifact@v4
+        with:
+            name: cobertura-html
+            path: backend/TestResults/coverage-report/index.html
 
 
       - name: ✅ CI finalizada com sucesso!
