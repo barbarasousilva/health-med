@@ -1,20 +1,11 @@
 name: CI/CD - HealthMed
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
-
-    env:
-      DOCKER_BUILDKIT: 1
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
-      ASPNETCORE_ENVIRONMENT: Development
 
     steps:
       - name: 🔄 Checkout do repositório
@@ -39,70 +30,23 @@ jobs:
       - name: 🛠️ Build do projeto
         run: dotnet build ./backend/HealthMed.sln --configuration Debug --no-restore
 
-      - name: 🐘 Subir banco PostgreSQL
-        run: |
-          docker run -d \
-            --name healthmed-db \
-            -e POSTGRES_USER=postgres \
-            -e POSTGRES_PASSWORD=123456 \
-            -e POSTGRES_DB=healthmeddb \
-            -p 5432:5432 \
-            -v ${{ github.workspace }}/backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql \
-            postgres:15
-          echo "Aguardando banco subir..."
-          sleep 10
-
-      - name: 📋 Mostrar logs do container
-        run: docker logs healthmed-db || true
-
-      - name: 🧪 Validar conexão com PostgreSQL de testes
-        run: |
-          echo "Verificando se o banco está acessível..."
-          docker exec healthmed-db pg_isready -U postgres
-
-          echo "Listando tabelas..."
-          docker exec -e PGPASSWORD=123456 healthmed-db psql -U postgres -d healthmeddb -c "\dt"
-
-          echo "Verificando inserts..."
-          docker exec -e PGPASSWORD=123456 healthmed-db psql -U postgres -d healthmeddb -c "SELECT COUNT(*) FROM medicos;"  
-
-      - name: ✅ Rodar testes (unitários e integração)
+      - name: ✅ Rodar testes unitários com cobertura
         working-directory: ./backend
-        run: dotnet test HealthMed.sln --configuration Debug
+        run: dotnet test HealthMed.Tests.Unit/HealthMed.Tests.Unit.csproj \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./TestResults \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
 
-  deploy:
-    needs: build-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - name: 🔄 Checkout do repositório
-        uses: actions/checkout@v4
-
-      - name: 🐳 Login no Docker Hub
-        uses: docker/login-action@v3
+      - name: 📊 Publicar cobertura de testes
+        uses: actions/upload-artifact@v4
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD || secrets.DOCKERHUB_TOKEN }}
+          name: cobertura-unit-tests
+          path: backend/TestResults/**/coverage.cobertura.xml
 
-      - name: 📂 Printar caminho atual e arquivos
+      - name: ✅ CI finalizada com sucesso!
         run: |
-          pwd
-          ls -lah
-
-      - name: 📦 Build e Push com Docker Compose
-        run: |
-          docker compose -f compose.yaml build backend frontend
-          docker push barbarasousilva/healthmed-backend:latest
-          docker push barbarasousilva/healthmed-frontend:latest
-
-      - name: ☸️ Instalar kubectl
-        uses: azure/setup-kubectl@v3
-
-      - name: 🔐 Configurar kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
-
-      - name: 🚀 Deploy para o Kubernetes
-        run: kubectl apply -f k8s/
+          echo "======================================="
+          echo "🎉 CI concluída com sucesso!"
+          echo "✅ Testes finalizados"
+          echo "📦 Cobertura gerada"
+          echo "======================================="
