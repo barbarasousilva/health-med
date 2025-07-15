@@ -38,11 +38,23 @@ jobs:
           --results-directory ./TestResults \
           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
 
-      - name: 📊 Publicar cobertura de testes
+      - name: 📊 Publicar análise de cobertura
         uses: actions/upload-artifact@v4
         with:
           name: cobertura-unit-tests
           path: backend/TestResults/**/coverage.cobertura.xml
+
+      - name: 📈 Gerar e exibir resumo da cobertura
+        run: |
+            dotnet tool install --global dotnet-reportgenerator-globaltool
+            export PATH="$PATH:/home/runner/.dotnet/tools"
+            reportgenerator \
+              -reports: backend/TestResults/**/coverage.cobertura.xml \
+              -targetdir: backend/TestResults/coverage-report \
+                      -reporttypes: TextSummary
+
+            echo "📄 Cobertura de código:"
+            cat backend/TestResults/coverage-report/Summary.txt || echo "Resumo não encontrado."
 
       - name: ✅ CI finalizada com sucesso!
         run: |
