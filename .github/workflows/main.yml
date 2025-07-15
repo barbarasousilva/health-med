@@ -49,8 +49,9 @@ jobs:
         run: |
             dotnet tool install --global dotnet-reportgenerator-globaltool
             export PATH="$PATH:/home/runner/.dotnet/tools"
+            REPORT_FILE=$(find TestResults -name 'coverage.cobertura.xml' | head -n 1)
             reportgenerator \
-              -reports: TestResults/**/coverage.cobertura.xml \
+              -reports:"$REPORT_FILE" \
               -targetdir: TestResults/coverage-report \
               -reporttypes: TextSummary
 
